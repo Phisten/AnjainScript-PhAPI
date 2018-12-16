@@ -1,0 +1,108 @@
+'phadvAnjain ver 1.1.0
+Randomize
+Dim intX,intY,targetX,targetY
+Dim tempBool
+Dim lastTapTime
+lastTapTime = TickCount()
+
+
+'-----------------------------------------------------------------------------------------
+'------------------------------- anjain advance function ---------------------------------
+
+'ex: "Btn_InTheStoryMenu_Skip_793,29,819,60..png" -> 793,29,819,60
+Function GetFindPicRangeFromFormattedPicName(picName)
+	Dim str1
+	str1 = picName
+	Dim last_
+	last_ = InStrRev(str1, "_", -1)
+	Dim dotdotPng
+	dotdotPng = InStrRev(str1, "..png", -1,true)
+	GetFindPicRangeFromFormattedPicName = Mid(str1,last_+1,dotdotPng-last_-1)
+End Function
+
+
+Function ShiftTapIfFind(x1,y1,x2,y2,picName,shiftX,shiftY)
+	tempBool = FindPicFunc(x1, y1, x2, y2, picName)
+	ShiftTapIfFind = tempBool
+	If tempBool Then
+		TapXy(shiftX + intX,shiftY + intY)
+	End If
+End Function
+Function TapRangeIfFind(x1,y1,x2,y2,picName,tapX1,tapY1,tapX2,tapY2)
+	tempBool = FindPicFunc(x1, y1, x2, y2, picName)
+	TapRangeIfFind = tempBool
+	If tempBool Then
+		TapRange(tapX1,tapY1,tapX2,tapY2)
+	End If
+End Function
+
+Function TapXyIfFind(x1,y1,x2,y2,picName,tapX,tapY)
+	tempBool = FindPicFunc(x1, y1, x2, y2, picName)
+	TapXyIfFind = tempBool
+	If tempBool Then
+		TapXy(tapX,tapY)
+	End If
+End Function
+Function TapIfFind
+	If HasFind() Then
+		TapFind
+	End If
+End Function
+Function HasFind()
+	tempBool = intX > -1 And intY > -1
+	HasFind = tempBool
+End Function
+Sub TapFind
+	TapXy intX,intY
+End Sub
+Sub TapRange(tapX1,tapY1,tapX2,tapY2)
+	targetX = tapX1 + (tapX2-tapX1) * Rnd()
+	targetY = tapY1 + (tapY2 - tapY1) * Rnd()
+	TapXy targetX,targetY
+End Sub
+
+'-----------------------------------------------------------------------------------------
+'----------------------------------- anjain Base API -------------------------------------
+Function FindColorFunc(x1,y1,x2,y2,colorName)
+	FindColorFunc = False
+	FindColor x1, y1 ,x2 ,y2 , colorName,0,0.9,intX,intY
+	If intX > -1 And intY > -1 Then 
+		TracePrint "Find " & colorName
+		FindColorFunc = True
+	End If
+End Function
+Function FindPicFunc(x1,y1,x2,y2,picName)
+	FindPicFunc = False
+	FindPic x1, y1 ,x2 ,y2 ,  "Attachment:" + picName, "000000", 0, 0.9, intX, intY
+	If intX > -1 And intY > -1 Then 
+		TracePrint "Find " & picName
+		FindPicFunc = True
+	End If
+End Function
+Function FindFuzzyPicFunc(x1,y1,x2,y2,picName,direct,fuzzyRate)
+	FindFuzzyPicFunc = False
+	FindPic x1, y1 ,x2 ,y2 , picName, "000000", direct, fuzzyRate, intX, intY
+	If intX > -1 And intY > -1 Then 
+		TracePrint "Find " & picName
+		FindFuzzyPicFunc = True
+	End If
+End Function
+
+Sub TapXy(tapX, tapY)
+	targetX = tapX + 5 * Rnd()
+	targetY = tapY + 5 * Rnd()
+	Delay 10 + Sqr(TickCount()-lastTapTime) * Rnd()
+	Tap targetX, targetY
+	lastTapTime = TickCount()
+	TracePrint "Tap " & targetX & "," & targetY
+	Delay 10 + 15 * Rnd()
+End Sub
+
+Sub PrintIfFind(msgStr)
+	If intX > -1 And intY > -1 Then
+		TracePrint msgStr
+	End If
+End Sub
+Sub DelayRnd(BaseDelay,RndDelay)
+	Delay BaseDelay + RndDelay*Rnd()
+End Sub
