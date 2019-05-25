@@ -10,6 +10,7 @@
 '		Find Mode: Color
 ' 	    Find param: direct
 '		RndRange func
+'		ShiftXY
 
 Randomize
 Dim intX,intY,targetX,targetY,targetX2,targetY2
@@ -19,7 +20,7 @@ lastTapTime = TickCount()
 
 '-------------------------
 'Find Func String
-Dim pic,findRect,tapMode,Rect,dropAB,DoNothing,tapFindXY,fuzzyRate,findDelay,Dot,color,Direct,rand
+Dim pic,findRect,tapMode,Rect,dropAB,DoNothing,tapFindXY,fuzzyRate,findDelay,Dot,color,Direct,rand,shiftXY
 pic = "pic"
 color = "color"
 findRect = "findRect"
@@ -33,6 +34,7 @@ Direct = "Direct"
 fuzzyRate = "fuzzyRate"
 findDelay = "FindDelay"
 rand = "rand"
+shiftXY = "shiftXY"
 '-----------------------------------------------------------------------------------------
 '------------------------------- anjain advance function ---------------------------------
 
@@ -105,7 +107,6 @@ Function Find(p)
     If p[findRect] <> null Then 
     	FindAction = findRect
         ArrTemp = SplitComma(p[findRect])
-    	FindAction = findRect
         If UBound(ArrTemp) = 3 Then 
         	find_x1 = ArrTemp(0)
         	find_y1 = ArrTemp(1)
@@ -169,6 +170,9 @@ Function Find(p)
         tap_y1 = ArrTemp(1)
         FindAction = Dot
 	End If
+	If p[shiftXY] <> null Then 
+		FindAction = shiftXY
+	End If
 	
 	'override FindAction
 	If p[tapMode] <> null Then 
@@ -187,6 +191,11 @@ Function Find(p)
 			Case Dot
 				TapXy tap_x1, tap_y1
 			Case tapFindXY
+				TapFind
+			Case shiftXY
+        		ArrTemp = SplitComma(p[shiftXY])
+				intX = intX + ArrTemp(0)
+				intY = intY + ArrTemp(1)
 				TapFind
 			Case DoNothing
 				'DoNothing
@@ -218,7 +227,7 @@ Function FindColorFunc(x1, y1, x2, y2, colorName,direct,fuzzyRate)
     FindColorFunc = False
     FindColor x1, y1 ,x2 ,y2 , colorName,direct,fuzzyRate,intX,intY
     If intX > -1 And intY > -1 Then 
-        TracePrint "Find " & colorName & " " & intX & "," & intY
+        TracePrint Now() & " Find " & colorName & " " & intX & "," & intY
         FindColorFunc = True
     End If
 End Function
@@ -226,7 +235,7 @@ Function FindPicFunc(x1,y1,x2,y2,picName,direct,fuzzyRate)
     FindPicFunc = False
     FindPic x1, y1 ,x2 ,y2 ,  "Attachment:" & picName, "000000", direct, fuzzyRate, intX, intY
     If intX > -1 And intY > -1 Then 
-        TracePrint "Find " & picName & " " & intX & "," & intY
+        TracePrint Now() & " Find " & picName & " " & intX & "," & intY
         FindPicFunc = True
     End If
 End Function
@@ -268,3 +277,6 @@ Function RndRange(min,max)
 	RndRange = Int((max - min + 1) * Rnd() + min)
 End Function
 
+
+'-----------------------------------------------------------------------------------------
+// Main Loop
